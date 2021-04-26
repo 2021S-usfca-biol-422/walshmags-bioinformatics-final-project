@@ -1,6 +1,6 @@
 ---
 title: 'Your Title Here'
-author: "Don Francisco"
+author: "Maggie Walsh"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: pdf_document
 csl: bioinformatics.csl
@@ -8,7 +8,7 @@ bibliography: references.bib
 params:
   gff_file_path: "data/metadata/sars_refgenome_annotation.gff"
   vcf_dir_path: "data/11_vcf_output_for_R"
-  sra_runtable_path: "data/00_sra_runtable/SraRunTable_PRJNA656695_short_example.txt"
+  sra_runtable_path: "data/00_sra_runtable/SraRunTable_NY_fixed.txt"
 ---
 
 ```{r setup, include = FALSE}
@@ -43,6 +43,7 @@ library("vcfR")
 library("ggplot2")
 library("dplyr")
 library("ggthemes")
+library("COVID19")
 
 # this loads all function files in the code/functions directory
 function_paths <- list.files("code/functions", full.names = TRUE)
@@ -88,6 +89,24 @@ vcf_with_metadata %>%
 ```
 
 **Figure 1**: N and S genes have more unique SNPs in the set of samples analyzed.
+
+```{r Covid-Data}
+#trying to use COVID19 package to look at data regarding New York city
+# first get New York data from period of interest
+covid_data <- COVID19::covid19(country = "USA",
+                                  level = 3,
+                                  start = "2020-03-11",
+                                  end = "2020-04-08")
+NY_covid_data <- covid_data %>%
+  filter(administrative_area_level_3 == "New York City")
+
+NY_covid_data_plot <- NY_covid_data %>%
+  ggplot(aes(date, confirmed)) +
+         geom_line()
+  
+NY_covid_data_plot
+
+```
 
 # Tables
 
