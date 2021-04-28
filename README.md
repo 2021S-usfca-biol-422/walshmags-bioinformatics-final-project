@@ -23,6 +23,7 @@ ID number: 721724
  * create figures that demonstrate how coronavirus rescticions impacted variant data in New York
 
 ## Change Log
+2021-4-28: Used `COVID19` package data to create figures showing nationwide Covid-19 case numbers and case numbers in New york city.
 2021-4-26: Finished variant calling analysis of New York SARS-CoV-2 sequences. Added vcf data to report Rmd and started using NY covid data to create figures.
 2021-4-19: Forked and cloned template repo, and updated README to include plan for final project. 
 
