@@ -44,6 +44,7 @@ library("ggplot2")
 library("dplyr")
 library("ggthemes")
 library("COVID19")
+library("gghighlight")
 
 # this loads all function files in the code/functions directory
 function_paths <- list.files("code/functions", full.names = TRUE)
@@ -92,22 +93,81 @@ vcf_with_metadata %>%
 
 ```{r Covid-Data}
 #trying to use COVID19 package to look at data regarding New York city
-# first get New York data from period of interest
-covid_data <- COVID19::covid19(country = "USA",
+# first get all covid data from period of interest
+covid_data_broad <- COVID19::covid19(country = "USA",
+                                  level = 2,
+                                  start = "2020-02-01",
+                                  end = "2021-04-28")
+
+# make a plot summarizing covid cases by state during this time
+covid_plot <- covid_data_broad %>%
+  ggplot(aes(date, confirmed)) +
+  geom_line(aes(group = administrative_area_level_2)) +
+  gghighlight(administrative_area_level_2 == "New York") +
+  labs(title = "Number of Confirmed SARS-CoV-2 Cases by State",
+       x = "Date", y = "Confirned Cases") +
+  theme_clean()
+
+covid_plot
+
+```
+***Figure 1***: As shown in this plot of confirmed SARS-CoV-2 cases in the past year, New York state was the hardest hit early on in the pandemic having a majority of the nations confirmed cases. The steep rise in cases was contained in subsequent months. In recent winter months, New York has again seen a steep rise in cases.
+
+
+```{r NY-Data}
+# get specific covid data
+covid_data_specific <- COVID19::covid19(country = "USA",
                                   level = 3,
-                                  start = "2020-03-11",
-                                  end = "2020-04-08")
-NY_covid_data <- covid_data %>%
+                                  start = "2020-03-01",
+                                  end = "2021-04-28")
+
+# filter out NY data
+NY_covid_data <- covid_data_specific %>%
   filter(administrative_area_level_3 == "New York City")
 
+# Make plot of cases in NY
 NY_covid_data_plot <- NY_covid_data %>%
   ggplot(aes(date, confirmed)) +
-         geom_line()
+         geom_line() +
+  labs(title = "Number of Confirmed Covid Cases in New York City",
+       y = "Confirmed Cases", x = "Date") +
+  geom_vline(xintercept = as.numeric(as.Date("2020-03-20")),
+             linetype = "dashed",
+             color = "green") +
+  theme_clean()
   
 NY_covid_data_plot
 
 ```
+***Figure 2***
 
+```{r NY-zoomed-in}
+# get specific covid data thats zoomed in on specific period
+covid_data_specific_zoom <- COVID19::covid19(country = "USA",
+                                  level = 3,
+                                  start = "2020-03-01",
+                                  end = "2020-04-10")
+
+NY_covid_data_zoom <- covid_data_specific_zoom %>%
+  filter(administrative_area_level_3 == "New York City")
+
+# Make plot of cases in NY
+NY_covid_data_zoom_plot <- NY_covid_data_zoom %>%
+  ggplot(aes(date, confirmed)) +
+         geom_line() +
+  labs(title = "Number of Confirmed Covid Cases in New York City",
+       y = "Confirmed Cases", x = "Date") +
+  geom_vline(xintercept = as.numeric(as.Date("2020-03-20")),
+             linetype = "dashed",
+             color = "green") +
+  theme_clean()
+  
+NY_covid_data_zoom_plot
+```
+
+```{r NY-mobility-data}
+#look at mobility data to get an idea of what mobility was like in NYC
+```
 # Tables
 
 ```{r example-table}
