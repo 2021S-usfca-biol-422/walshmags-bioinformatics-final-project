@@ -166,7 +166,18 @@ NY_covid_data_zoom_plot
 ```
 
 ```{r NY-mobility-data}
-#look at mobility data to get an idea of what mobility was like in NYC
+# look at mobility data to get an idea of what mobility was like in NYC
+covid_data_NY_mobility <- COVID19::covid19(country = "USA",
+                              level = 3,
+                              start = "2020-03-01",
+                              end = "2020-04-10",
+                              gmr =  paste0("https://www.gstatic.com/covid19/",
+                                           "mobility/",
+                                           "Global_Mobility_Report.csv"))
+
+# filter NYC data
+NY_covid_data_mobility <- covid_data_NY_mobility %>%
+  filter(administrative_area_level_3 == "New York City")
 ```
 # Tables
 
