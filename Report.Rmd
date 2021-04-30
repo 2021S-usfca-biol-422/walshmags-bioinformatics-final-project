@@ -178,7 +178,20 @@ covid_data_NY_mobility <- COVID19::covid19(country = "USA",
 # filter NYC data
 NY_covid_data_mobility <- covid_data_NY_mobility %>%
   filter(administrative_area_level_3 == "New York City")
+
+#Plot
+NY_covid_data_mobility_plot <- NY_covid_data_mobility %>%
+  ggplot(aes(date, transit_stations_percent_change_from_baseline)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Bar Plot of Transit Mobility in New York City",
+       x = "Date",
+       y = "Percent Change from Baseline at Transit Stations") +
+  theme_clean()
+
+NY_covid_data_mobility_plot
+
 ```
+***Figure 4*** Bar plot showing percent change in mobility at transit stations in New York, from a baseline set before the pandemic. 
 # Tables
 
 ```{r example-table}
