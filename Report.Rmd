@@ -111,7 +111,7 @@ covid_plot <- covid_data_broad %>%
 covid_plot
 
 ```
-***Figure 1***: As shown in this plot of confirmed SARS-CoV-2 cases in the past year, New York state was the hardest hit early on in the pandemic having a majority of the nations confirmed cases. The steep rise in cases was contained in subsequent months. In recent winter months, New York has again seen a steep rise in cases.
+***Figure 1***: Plot of confirmed SARS-CoV-2 cases in the past year. New York state was the hardest hit early on in the pandemic having a majority of the nations confirmed cases. The steep rise in cases was contained in subsequent months. In recent winter months, New York, alongside other states, has again seen a steep rise in cases.
 
 
 ```{r NY-Data}
