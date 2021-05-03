@@ -1,5 +1,5 @@
 ---
-title: 'Your Title Here'
+title: 'Analysis of SARS-CoV-2 Infection In New York City at Early Stages of the COVID-19 Pandemic'
 author: "Maggie Walsh"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: pdf_document
@@ -123,34 +123,34 @@ covid_data_specific <- COVID19::covid19(country = "USA",
                                   end = "2021-04-28")
 
 # filter out NY data
-NY_covid_data <- covid_data_specific %>%
+ny_covid_data <- covid_data_specific %>%
   filter(administrative_area_level_3 == "New York City")
 
 # Make plot of cases in NY
-NY_covid_data_plot <- NY_covid_data %>%
+ny_covid_data_plot <- ny_covid_data %>%
   ggplot(aes(date, confirmed)) +
          geom_line() +
   labs(title = "Number of Confirmed Cases in New York City",
        y = "Confirmed Cases", x = "Date") +
   theme_clean()
   
-NY_covid_data_plot
+ny_covid_data_plot
 
 ```
 ***Figure 2*** Looking specifically at New York City, we can see a similar trend. New York City was responsible for a large portion of the nations case numbers during the first wave of the pandemic.
 
-```{r NY-zoomed-in}
+```{r ny-zoomed-in}
 # get specific covid data thats zoomed in on specific period
 covid_data_specific_zoom <- COVID19::covid19(country = "USA",
                                   level = 3,
                                   start = "2020-03-01",
                                   end = "2020-04-10")
 
-NY_covid_data_zoom <- covid_data_specific_zoom %>%
+ny_covid_data_zoom <- covid_data_specific_zoom %>%
   filter(administrative_area_level_3 == "New York City")
 
 # Make plot of cases in NY
-NY_covid_data_zoom_plot <- NY_covid_data_zoom %>%
+ny_covid_data_zoom_plot <- ny_covid_data_zoom %>%
   ggplot(aes(date, confirmed)) +
          geom_line() +
   labs(title = "Number of Confirmed Cases in New York City",
@@ -160,13 +160,13 @@ NY_covid_data_zoom_plot <- NY_covid_data_zoom %>%
              color = "green") +
   theme_clean()
   
-NY_covid_data_zoom_plot
+ny_covid_data_zoom_plot
 ```
 ***Figure 3*** Going for a zoomed-in look, we can see how rapidly new cases of SARS-CoV-2 infection were being recorded during a short few-week period in New York City. This steep incline likely reflects a greater rate of testing. The dashed green line indicates when New York State issued a statewide mandatory stay at home order.
 
-```{r NY-mobility-data}
+```{r ny-mobility-data}
 # look at mobility data to get an idea of what mobility was like in NYC
-covid_data_NY_mobility <- COVID19::covid19(country = "USA",
+covid_data_ny_mobility <- COVID19::covid19(country = "USA",
                               level = 3,
                               start = "2020-03-01",
                               end = "2020-04-10",
@@ -175,13 +175,13 @@ covid_data_NY_mobility <- COVID19::covid19(country = "USA",
                                            "Global_Mobility_Report.csv"))
 
 # filter NYC data
-NY_covid_data_mobility <- covid_data_NY_mobility %>%
+ny_covid_data_mobility <- covid_data_ny_mobility %>%
   filter(administrative_area_level_3 == "New York City")
 
 # Plot
 # uses code from https://designdatadecisions.wordpress.com/2015/07/23/
 # html cont waterfall-plots-what-and-how/
-NY_covid_data_mobility_plot <- NY_covid_data_mobility %>%
+ny_covid_data_mobility_plot <- ny_covid_data_mobility %>%
   ggplot(aes(date, transit_stations_percent_change_from_baseline)) +
   geom_bar(stat = "identity") +
   labs(title = "Bar Plot of Transit Mobility in New York City",
@@ -189,13 +189,13 @@ NY_covid_data_mobility_plot <- NY_covid_data_mobility %>%
        y = "% change from baseline") +
   theme_clean()
 
-NY_covid_data_mobility_plot
+ny_covid_data_mobility_plot
 
 ```
 ***Figure 4*** Bar plot showing percent change in mobility at transit stations in New York, from a baseline set before the pandemic. This metric contradicts the steep rise in cases during this time, unless you account for the variable incubation time of the SARS-CoV-2 virus, and the probability of higher case rates in early 2020 than shown above due to insufficient testing. For more mobility information, see Table 1. 
 
 ```{r vcf-analysis}
-# use vcfr package to do analysis of vcf data 
+# use vcfr package to do analysis of vcf data
 vcf_with_metadata %>%
   filter(!is.na(gene)) %>% # get rid of SNPs not in gene regions
   group_by(Collection_Date, gene) %>%
@@ -254,6 +254,13 @@ NY_covid_data_mobility %>%
 ```{r vcf-table}
 # make a table showing different SNPs and their locations
 vcf_with_metadata %>%
-  select(sample, gene, ref, alt, qual) %>%
+  filter(!is.na(gene)) %>% # get rid of SNPs not in gene regions
+  group_by(gene, pos) %>%
+  tally() %>% # this gives a column n for the number of gene by position
+  group_by(gene) %>%
+  tally() %>%
+  knitr::kable(col.names = c("Gene Name",
+                             "Count"))
 ```
+***Table 2*** Count of distinct SNP's found for each named gene in the SARS-CoV-2 genome. 
 # Sources Cited
