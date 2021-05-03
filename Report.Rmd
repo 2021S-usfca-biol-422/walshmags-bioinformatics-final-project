@@ -20,21 +20,12 @@ knitr::opts_chunk$set(echo = FALSE,
 
 # Background and Overview
 
-This is a report on SARS-CoV-2, including some variant analysis [@koyama2020variant].
+In early 2020, the world was forever changed by the spread of the coronavirus disease (COVID-19), which was declared a global pandemic by the WHO by early March. In the United States, New York City became the epicenter, with 203,000 confirmed cases between the months of March and May [@thompson2020covid]. Although news of the virus was widely overlooked initially, people quickly became aware of the insidious nature of the SARS-CoV-2 virus, including variable incubation times, and it's ability to spread via asymptomatic carriers. New York City was placed under a statewide lock-down on March 22, 2020, and the number of confirmed cases peaked a week later [@thompson2020covid]. As the machinery of our society was grinding to a halt, researchers raced to understand the SARS-CoV-2 virus in order to prevent further devastation. My goal for this report was to synthesize some of that research, and generate my own analysis that explains what was going on in New York City during the onset of the pandemic. My analysis started with a look into SARS-CoV-2 tests in New York, as well as a look at changes in mobility during this time. I used a bash pipeline to analyze sequence data taken from nasopharyngeal swabs of people in New York City from early March to late April. Variants were called from
 
 # Methods
+## Sequence Analysis
+Sequences were downloaded to a secure server from the [NCBI database](https://www.ncbi.nlm.nih.gov/) using the [accession ID](https://www.ncbi.nlm.nih.gov//bioproject/PRJNA721724). The bash pipeline was executed on the server using a makefile to output vcf files for analysis. Specific steps of the pipeline can be found in the code folder. Parts of the pipeline approach are based on the pipeline described in the [Data Carpentry Genomics lessons](https://datacarpentry.org/genomics-workshop/), which are made available under a [CC-BY 4.0 license](https://creativecommons.org/licenses/by/4.0/). 
 
-See the set of tutorials on the [vcfR package website](https://knausb.github.io/vcfR_documentation/index.html).
-
-You may also want to use any of a range of different COVID data packages and data sources:
-
-* https://kjhealy.github.io/covdata/
-* https://github.com/como-ph/oxcovid19
-* https://ropensci.org/blog/2020/10/20/searching-medrxivr-and-biorxiv-preprint-data/
-* https://covidtracking.com/data/api
-  * `readr::read_csv("https://api.covidtracking.com/v1/states/daily.csv")`
-
-## Subsections are ok too
 
 # Results and Discussion
 
@@ -200,10 +191,11 @@ ny_covid_data_mobility_plot
 clade_info <- read_tsv(paste0("https://raw.githubusercontent.com/nextstrain/",
                               "ncov/master/defaults/clades.tsv"))
 
+View(tidyr::pivot_wider(clade_info, names_from = clade, values_from = alt) %>% select(-gene) %>% arrange(site))
+
 # merge with vcf_with_metadata
 vcf_with_clade <- vcf_with_metadata %>%
   left_join(clade_info, by = c("pos" = "site"))
-
 
 # make plot
 clade_plot <- vcf_with_clade %>%
