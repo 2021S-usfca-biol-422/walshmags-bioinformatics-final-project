@@ -46,6 +46,7 @@ library("ggthemes")
 library("COVID19")
 library("gghighlight")
 library("lubridate")
+library("readr")
 
 # this loads all function files in the code/functions directory
 function_paths <- list.files("code/functions", full.names = TRUE)
@@ -194,35 +195,34 @@ ny_covid_data_mobility_plot
 ```
 ***Figure 4*** Bar plot showing percent change in mobility at transit stations in New York, from a baseline set before the pandemic. This metric contradicts the steep rise in cases during this time, unless you account for the variable incubation time of the SARS-CoV-2 virus, and the probability of higher case rates in early 2020 than shown above due to insufficient testing. For more mobility information, see Table 1. 
 
-```{r vcf-analysis}
-# use vcfr package to do analysis of vcf data
-vcf_with_metadata %>%
-  filter(!is.na(gene)) %>% # get rid of SNPs not in gene regions
-  group_by(Collection_Date, gene) %>%
-  ggplot(aes(Collection_Date)) +
-    geom_bar(position = "dodge2", aes(fill = gene)) +
-    labs(title = "Functional Variants Found in Sample by Collection Date",
-         x = "Day") +
+```{r vcf-clade-analysis}
+# use clade file to do phylogenetic analysis of vcf data
+clade_info <- read_tsv(paste0("https://raw.githubusercontent.com/nextstrain/",
+                              "ncov/master/defaults/clades.tsv"))
+
+# merge with vcf_with_metadata
+vcf_with_clade <- vcf_with_metadata %>%
+  left_join(clade_info, by = c("pos" = "site"))
+
+
+# make plot
+clade_plot <- vcf_with_clade %>%
+  select(sample, pos, alt.x, clade) %>%
+  filter(!is.na(clade)) %>% 
+  ggplot(aes(clade)) +
+  geom_bar() +
+  labs(title = "Count of Variants Called by Assigned Clade") +
   theme_clean()
 
+clade_plot
 ```
-
+***Figure 5*** 
 # Tables
-
-```{r example-table}
-# An example table to show the length of each gene using its start and end
-gene_table %>%
-  mutate(length = end - start) %>%
-  select(gene_name, start, end, length) %>%
-  knitr::kable(col.names = c("Gene Name",
-                             "Start",
-                             "End",
-                             "Length"))
-```
-**Table 1**: Gene names, locations, and lengths in the SARS-CoV-2 genome. Higher SNP counts in the S and N genes may be related to the larger size of these genes.
 
 ```{r mobility-table}
 # Make a table summarizing all of the google mobility data
+# using code from https://stackoverflow.com/questions/40554231/
+# html cont dplyr-lubridate-how-to-aggregate-a-dataframe-by-week/4055452
 NY_covid_data_mobility %>%
   select(date, retail_and_recreation_percent_change_from_baseline,
          grocery_and_pharmacy_percent_change_from_baseline,
@@ -250,6 +250,15 @@ NY_covid_data_mobility %>%
 ```
 ***Table 1*** Summary of Google mobility data from weeks 9-15 of the year 2020. Values represent the mean percent change from baseline for that week. The table shows a gradual decrease in most mobility factors over the first several weeks of the pandemic. Notably, the Google data shows an increase in mobility to grocery stores during weeks 9-11 which likely reflects the panic fueled stockpiling of necessities, a trend seen across the US which led to a shortage of items like toilet paper. Additionally, there was increasing mobility in residential areas, reflecting people seeking outdoor exercise around their homes during quarantine.   
 
+```{r variant-table}
+# make a table showing different SNPs and their locatioms
+vcf_with_metadata %>%
+  group_by(gene) %>%
+  tally() %>% 
+  knitr::kable(col.names = c("Gene Name",
+                             "Count"))
+```
+***Table 2***
 
 ```{r vcf-table}
 # make a table showing different SNPs and their locations
@@ -262,5 +271,17 @@ vcf_with_metadata %>%
   knitr::kable(col.names = c("Gene Name",
                              "Count"))
 ```
-***Table 2*** Count of distinct SNP's found for each named gene in the SARS-CoV-2 genome. 
+***Table 3*** Count of distinct SNP's found for each named gene in the SARS-CoV-2 genome. 
+
+```{r example-table}
+# An example table to show the length of each gene using its start and end
+gene_table %>%
+  mutate(length = end - start) %>%
+  select(gene_name, start, end, length) %>%
+  knitr::kable(col.names = c("Gene Name",
+                             "Start",
+                             "End",
+                             "Length"))
+```
+**Table 4**: Gene names, locations, and lengths in the SARS-CoV-2 genome. 
 # Sources Cited
