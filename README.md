@@ -4,10 +4,7 @@
 ## mcwalsh@dons.usfca.edu
 
 ### Overview
-My plan for this project is to explore SARS-CoV-2 sequence data from New York City in the early stages of the 
-Pandemic. I plan to use transportation data and other municipal data recources to track how the shelter in place 
-order and other restrictions may have had an impact on the types of variants that were detected in the city 
-around that time.
+My plan for this project is to explore SARS-CoV-2 sequence data from New York City in the early stages of the Pandemic. I plan to use transportation data and other municipal data recources to track how the shelter in place order and other restrictions may have had an impact on the types of variants that were detected in the city around that time.
 
 ### SRA Bioproject ID
 Acession: PRJNA721724 
@@ -23,11 +20,8 @@ ID number: 721724
  * create figures that demonstrate how coronavirus rescticions impacted variant data in New York
 
 ## Change Log
-2021-4-30: Created plot of mobility data in New York
-2021-4-28: Used `COVID19` package data to create figures showing nationwide Covid-19 case numbers and case numbers in New york city.
-2021-4-26: Finished variant calling analysis of New York SARS-CoV-2 sequences. Added vcf data to report Rmd and started using NY covid data to create figures.
-2021-4-19: Forked and cloned template repo, and updated README to include plan for final project. 
-
-
-Parts of this pipeline approach are based on the pipeline described in the [Data Carpentry Genomics lessons](https://datacarpentry.org/genomics-workshop/), which are made available under a [CC-BY 4.0 license](https://creativecommons.org/licenses/by/4.0/).
-
+2021-05-03: Started code to identify samples by clade, started report write up and generated tables to visualise mobility and variant data.
+2021-04-30: Created plot of mobility data in New York
+2021-04-28: Used `COVID19` package data to create figures showing nationwide Covid-19 case numbers and case numbers in New York City.
+2021-04-26: Finished variant calling analysis of New York SARS-CoV-2 sequences. Added vcf data to report Rmd and started using NY covid data to create figures.
+2021-04-19: Forked and cloned template repo, and updated README to include plan for final project. 
