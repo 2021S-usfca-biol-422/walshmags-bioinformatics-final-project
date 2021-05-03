@@ -45,6 +45,7 @@ library("dplyr")
 library("ggthemes")
 library("COVID19")
 library("gghighlight")
+library("lubridate")
 
 # this loads all function files in the code/functions directory
 function_paths <- list.files("code/functions", full.names = TRUE)
@@ -129,17 +130,14 @@ NY_covid_data <- covid_data_specific %>%
 NY_covid_data_plot <- NY_covid_data %>%
   ggplot(aes(date, confirmed)) +
          geom_line() +
-  labs(title = "Number of Confirmed Covid Cases in New York City",
+  labs(title = "Number of Confirmed Cases in New York City",
        y = "Confirmed Cases", x = "Date") +
-  geom_vline(xintercept = as.numeric(as.Date("2020-03-20")),
-             linetype = "dashed",
-             color = "green") +
   theme_clean()
   
 NY_covid_data_plot
 
 ```
-***Figure 2***
+***Figure 2*** Looking specifically at New York City, we can see a similar trend. New York City was responsible for a large portion of the nations case numbers during the first wave of the pandemic.
 
 ```{r NY-zoomed-in}
 # get specific covid data thats zoomed in on specific period
@@ -155,7 +153,7 @@ NY_covid_data_zoom <- covid_data_specific_zoom %>%
 NY_covid_data_zoom_plot <- NY_covid_data_zoom %>%
   ggplot(aes(date, confirmed)) +
          geom_line() +
-  labs(title = "Number of Confirmed Covid Cases in New York City",
+  labs(title = "Number of Confirmed Cases in New York City",
        y = "Confirmed Cases", x = "Date") +
   geom_vline(xintercept = as.numeric(as.Date("2020-03-20")),
              linetype = "dashed",
@@ -164,6 +162,7 @@ NY_covid_data_zoom_plot <- NY_covid_data_zoom %>%
   
 NY_covid_data_zoom_plot
 ```
+***Figure 3*** Going for a zoomed-in look, we can see how rapidly new cases of SARS-CoV-2 infection were being recorded during a short few-week period in New York City. This steep incline likely reflects a greater rate of testing. The dashed green line indicates when New York State issued a statewide mandatory stay at home order.
 
 ```{r NY-mobility-data}
 # look at mobility data to get an idea of what mobility was like in NYC
@@ -179,19 +178,35 @@ covid_data_NY_mobility <- COVID19::covid19(country = "USA",
 NY_covid_data_mobility <- covid_data_NY_mobility %>%
   filter(administrative_area_level_3 == "New York City")
 
-#Plot
+# Plot
+# uses code from https://designdatadecisions.wordpress.com/2015/07/23/
+# html cont waterfall-plots-what-and-how/
 NY_covid_data_mobility_plot <- NY_covid_data_mobility %>%
   ggplot(aes(date, transit_stations_percent_change_from_baseline)) +
   geom_bar(stat = "identity") +
   labs(title = "Bar Plot of Transit Mobility in New York City",
        x = "Date",
-       y = "Percent Change from Baseline at Transit Stations") +
+       y = "% change from baseline") +
   theme_clean()
 
 NY_covid_data_mobility_plot
 
 ```
-***Figure 4*** Bar plot showing percent change in mobility at transit stations in New York, from a baseline set before the pandemic. 
+***Figure 4*** Bar plot showing percent change in mobility at transit stations in New York, from a baseline set before the pandemic. This metric contradicts the steep rise in cases during this time, unless you account for the variable incubation time of the SARS-CoV-2 virus, and the probability of higher case rates in early 2020 than shown above due to insufficient testing. For more mobility information, see Table 1. 
+
+```{r vcf-analysis}
+# use vcfr package to do analysis of vcf data 
+vcf_with_metadata %>%
+  filter(!is.na(gene)) %>% # get rid of SNPs not in gene regions
+  group_by(Collection_Date, gene) %>%
+  ggplot(aes(Collection_Date)) +
+    geom_bar(position = "dodge2", aes(fill = gene)) +
+    labs(title = "Functional Variants Found in Sample by Collection Date",
+         x = "Day") +
+  theme_clean()
+
+```
+
 # Tables
 
 ```{r example-table}
@@ -204,7 +219,41 @@ gene_table %>%
                              "End",
                              "Length"))
 ```
-
 **Table 1**: Gene names, locations, and lengths in the SARS-CoV-2 genome. Higher SNP counts in the S and N genes may be related to the larger size of these genes.
 
+```{r mobility-table}
+# Make a table summarizing all of the google mobility data
+NY_covid_data_mobility %>%
+  select(date, retail_and_recreation_percent_change_from_baseline,
+         grocery_and_pharmacy_percent_change_from_baseline,
+         parks_percent_change_from_baseline,
+         transit_stations_percent_change_from_baseline,
+         workplaces_percent_change_from_baseline,
+         residential_percent_change_from_baseline) %>%
+  mutate(week = week(date)) %>%
+  group_by(week) %>%
+  summarise(across(c(retail_and_recreation_percent_change_from_baseline,
+                     grocery_and_pharmacy_percent_change_from_baseline,
+                     parks_percent_change_from_baseline,
+                     transit_stations_percent_change_from_baseline,
+                     workplaces_percent_change_from_baseline,
+                     residential_percent_change_from_baseline),
+                   ~ mean(.x))) %>%
+  knitr::kable(col.names = c("Week",
+                             "Reail and Recreation",
+                             "Grocery and Pharmacy",
+                             "Parks",
+                             "Transit Stations",
+                             "Workplaces",
+                             "Residential"))
+
+```
+***Table 1*** Summary of Google mobility data from weeks 9-15 of the year 2020. Values represent the mean percent change from baseline for that week. The table shows a gradual decrease in most mobility factors over the first several weeks of the pandemic. Notably, the Google data shows an increase in mobility to grocery stores during weeks 9-11 which likely reflects the panic fueled stockpiling of necessities, a trend seen across the US which led to a shortage of items like toilet paper. Additionally, there was increasing mobility in residential areas, reflecting people seeking outdoor exercise around their homes during quarantine.   
+
+
+```{r vcf-table}
+# make a table showing different SNPs and their locations
+vcf_with_metadata %>%
+  select(sample, gene, ref, alt, qual) %>%
+```
 # Sources Cited
