@@ -20,7 +20,7 @@ knitr::opts_chunk$set(echo = FALSE,
 
 # Background and Overview
 
-In early 2020, the world was forever changed by the spread of the coronavirus disease (COVID-19), which was declared a global pandemic by the WHO in early March. New York City quickly emerged as the epicenter in the United States with 203,000 confirmed cases between the months of March and May [@thompson2020covid]. Although news of the virus was widely overlooked initially, people quickly became aware of the insidious nature of the SARS-CoV-2 virus. The SARS-CoV-2 virus became hard to track due to variable incubation time and it's ability to spread via asymptomatic carriers. The only way to fight this virus early on was through limiting person to person interaction. New York City was placed under a statewide lock-down on March 22, 2020. The number of confirmed cases peaked a week later [@thompson2020covid]. As the machinery of our society was grinding to a halt, researchers raced to understand the SARS-CoV-2 virus in order to prevent further devastation. My goal for this report was to synthesize some of that research, and generate my own analysis that explains what was going on in New York City during the onset of the pandemic. My analysis started with a look into SARS-CoV-2 case numbers in New York, as well as a look at changes in population mobility during this time. I also used a set of bioinformatics tools to analyze sequence data taken from nasopharyngeal swabs of people in New York City from early March to late April. Twelve samples were sequenced and variants were called against a reference genome to determine SNPs for variant analysis. The common consensus among researchers is that the high case numbers in New York City was the result of uncontrolled community spread after many different travelers (mainly from Europe) introduced the virus to the population [@bushman2020detection; @gonzalez2020introductions; @maurano2020sequencing]. My findings corroborate this story. I found that the population data pointed to  
+In early 2020, the world was forever changed by the spread of the coronavirus disease (COVID-19), which was declared a global pandemic by the WHO in early March. New York City quickly emerged as the epicenter in the United States with 203,000 confirmed cases between the months of March and May [@thompson2020covid]. Although news of the virus was widely overlooked initially, people quickly became aware of the insidious nature of the SARS-CoV-2 virus. The SARS-CoV-2 virus was hard to track due to it's variable incubation time and it's ability to spread via asymptomatic carriers. The only way to fight this virus early on was through limiting person to person interaction. New York City was placed under a statewide lock-down on March 22, 2020. The number of confirmed cases peaked a week later [@thompson2020covid]. As the machinery of our society was grinding to a halt, researchers raced to understand the SARS-CoV-2 virus in order to prevent further devastation. My goal for this report was to synthesize some of that research, and generate my own analysis that explains what was going on in New York City during the onset of the pandemic. My analysis started with a look into SARS-CoV-2 case numbers in New York, followed by a look at changes in population mobility during this time. I also used a set of bioinformatics tools to analyze sequence data taken from nasopharyngeal swabs of people in New York City from early March to late April. Twelve samples were sequenced and variants were called against a reference genome to determine SNPs for analysis. The common consensus among researchers is that the high case numbers in New York City was the result of uncontrolled community spread after many different travelers (mainly from Europe) introduced the virus to the population [@bushman2020detection; @gonzalez2020introductions; @maurano2020sequencing]. My findings corroborate this story. I found that the population data pointed to  
 
 # Methods
 
@@ -38,7 +38,19 @@ I manipulated tabular data using the [dplyr](https://dplyr.tidyverse.org/) packa
 ### Additional data sources
 I accessed additional data sources using the COVID19 R package [@Guidotti2020]. Case numbers originated from the Oxford [COVID-19 GOVERNMENT RESPONSE TRACKER](https://www.bsg.ox.ac.uk/research/research-projects/covid-19-government-response-tracker) data set. Mobility data was from the [Google Mobility Reports](https://www.google.com/covid19/mobility/). I also used clade definitions from the [NextClade](https://clades.nextstrain.org/) project.
 
-# Results and Discussion
+# Results
+
+## Case Numbers
+I started my assessment of case numbers by looking with a wider lens. I wanted to look at New York State as a whole, and compare its confirmed case numbers to the rest of the country. As seen in Figure 1, the state of New York was far beyond other states in terms of positive case numbers early on in the pandemic. However, by the Summer of 2020 it seemed that the exponential growth in cases was stalled, and New York was no longer the state with the most confirmed cases by August. However, case numbers in New York did skyrocket again in the Winter months. To get an exact look at New York City, I narrowed my scope (Figure 2). It appears that the trends in case numbers in New York City followed a very similar pattern as seen in the state as a whole. Next, I narrowed in on my period of interest, the time frame in which my samples were collected (Figure 3). Between March 1st and April 10th, case numbers increased at alarming rates, going from almost no confirmed cases to tens of thousands of cases in a matter of weeks. This sharp incline was seen even after officials ordered a statewide lock-down.
+
+## Mobility Reports
+I wanted to use mobility data to gauge how New York City residents were adapting during this time. I chose to visualize transit mobility because I know that a large proportion of the population uses public transit to get around (Figure 4). Transit mobility experienced a sharp decline between March and April of 2020, diving over 80% below baseline levels by mid April. A similar trend can be seen in almost all of the mobility categories (Table 1). Interestingly, there is a clear inverse relationship between case numbers and citizen mobility.
+
+## Variant Analysis
+For my variant analysis, I compiled a list of distinct SNPs for each named gene in the SARS-CoV-2 genome (Table 2). I found a total of 7 different distinct SNPs in protein-coding regions. Three of those were found in the nucleocapsid (N) gene, while one distinct SNP was found in each of the remaining genes, S, M, ORF3a, and ORF10. To determine the significance of the variants found in each of my samples, I generated a matrix showing similarity between each sample and each of the known SARS-CoV-2 clades (Table 3). I used this information to generate a heat map which visualizes these similarities (Figure 5). The heat map singles out two samples (SRR14232249 and SRR14232250) as genetically distinct from the rest, with more similarity to the 20B and 20I/501Y.V1 clades. The remaining samples showed more similarity to the 20C and 20H/501Y.V2 clades. It is important to note that clade 20I/501Y.V1 is a descendant of clade 20B, and clade 20H/501Y.V2 is a descendant of clade 20C [@bedford_hodcroft_neher_2021]. This means that samples that are similar to 20B or 20C will also show some similarity to their descendants.
+
+# Discussion
+
 
 ```{r load-packages-and-functions}
 library("vcfR")
@@ -49,7 +61,6 @@ library("COVID19")
 library("gghighlight")
 library("lubridate")
 library("readr")
-library("RColorBrewer")
 
 # this loads all function files in the code/functions directory
 function_paths <- list.files("code/functions", full.names = TRUE)
@@ -98,7 +109,7 @@ covid_plot <- covid_data_broad %>%
 covid_plot
 
 ```
-***Figure 1***: Plot of confirmed SARS-CoV-2 cases in the past year. New York state was the hardest hit early on in the pandemic having a majority of the nations confirmed cases. The steep rise in cases was contained in subsequent months. In recent winter months, New York, alongside other states, has again seen a steep rise in cases.
+***Figure 1***: Plot of confirmed SARS-CoV-2 cases in the past year. New York state was the hardest hit early on in the pandemic having a majority of the nations confirmed cases. The steep rise in cases was contained in subsequent months. In recent winter months, New York, alongside other states, saw another steep rise in cases.
 
 
 ```{r NY-Data}
@@ -203,6 +214,7 @@ clade_plot <-
 clade_plot
 ```
 ***Figure 5*** Heat map showing relationships between clades and sample genotypes. Darker colors represent a greater similarity. Hirearchical clustering points to two genetically distinct groups, with differing clade distinctions. For exact values, see Table 3.
+
 # Tables
 
 ```{r mobility-table}
@@ -247,7 +259,7 @@ vcf_with_metadata %>%
   knitr::kable(col.names = c("Gene Name",
                              "Count"))
 ```
-***Table 2*** Count of distinct SNPs found for each named gene in the SARS-CoV-2 genome. In the samples provided, there were 7 distinct SNPs detected in named genes. Three of those variants were found in the N gene. It is worth noting that the SNP found in the spike protien was identified as the D614G variant which was the first known variant to surpass the wild type allele to become globally dominant.
+***Table 2*** Count of distinct SNPs found for each named gene in the SARS-CoV-2 genome. In the samples provided, there were 7 distinct SNPs detected in named genes. Three of those variants were found in the N gene. It is worth noting that the SNP found in the spike protein was identified as the D614G variant which was the first known variant to surpass the wild type allele to become globally dominant.
 
 ```{r clade-table}
 # make a table showing results from check clades function
