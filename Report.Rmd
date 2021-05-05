@@ -20,7 +20,7 @@ knitr::opts_chunk$set(echo = FALSE,
 
 # Background and Overview
 
-In early 2020, the world was forever changed by the spread of the coronavirus disease (COVID-19), which was declared a global pandemic by the WHO in early March. In the United States, New York City became the epicenter, with 203,000 confirmed cases between the months of March and May [@thompson2020covid]. Although news of the virus was widely overlooked initially, people quickly became aware of the insidious nature of the SARS-CoV-2 virus. The SARS-CoV-2 virus is hard to track due to variable incubation time and it's ability to spread via asymptomatic carriers. The only way to fight this virus early on was through limiting person to person interaction. New York City was placed under a statewide lock-down on March 22, 2020. The number of confirmed cases peaked a week later [@thompson2020covid]. As the machinery of our society was grinding to a halt, researchers raced to understand the SARS-CoV-2 virus in order to prevent further devastation. My goal for this report was to synthesize some of that research, and generate my own analysis that explains what was going on in New York City during the onset of the pandemic. My analysis started with a look into SARS-CoV-2 case numbers in New York, as well as a look at changes in population mobility during this time. I also used a set of bioinformatics tools to analyze sequence data taken from nasopharyngeal swabs of people in New York City from early March to late April. Twelve samples were sequenced and variants were called against a reference genome to determine SNPs for variant analysis. My findings support the common concensus among researchers, that sees the high case numbers in new York as a result
+In early 2020, the world was forever changed by the spread of the coronavirus disease (COVID-19), which was declared a global pandemic by the WHO in early March. New York City quickly emerged as the epicenter in the United States with 203,000 confirmed cases between the months of March and May [@thompson2020covid]. Although news of the virus was widely overlooked initially, people quickly became aware of the insidious nature of the SARS-CoV-2 virus. The SARS-CoV-2 virus became hard to track due to variable incubation time and it's ability to spread via asymptomatic carriers. The only way to fight this virus early on was through limiting person to person interaction. New York City was placed under a statewide lock-down on March 22, 2020. The number of confirmed cases peaked a week later [@thompson2020covid]. As the machinery of our society was grinding to a halt, researchers raced to understand the SARS-CoV-2 virus in order to prevent further devastation. My goal for this report was to synthesize some of that research, and generate my own analysis that explains what was going on in New York City during the onset of the pandemic. My analysis started with a look into SARS-CoV-2 case numbers in New York, as well as a look at changes in population mobility during this time. I also used a set of bioinformatics tools to analyze sequence data taken from nasopharyngeal swabs of people in New York City from early March to late April. Twelve samples were sequenced and variants were called against a reference genome to determine SNPs for variant analysis. The common consensus among researchers is that the high case numbers in New York City was the result of uncontrolled community spread after many different travelers (mainly from Europe) introduced the virus to the population [@bushman2020detection; @gonzalez2020introductions; @maurano2020sequencing]. My findings corroborate this story. I found that the population data pointed to  
 
 # Methods
 
@@ -36,7 +36,7 @@ I analyzed the output from the bash pipeline in RStudio using a series of functi
 I manipulated tabular data using the [dplyr](https://dplyr.tidyverse.org/) package. I made figures using the package [ggplot2](https://ggplot2.tidyverse.org/reference/index.html) and formatted them using the packages [ggthemes](https://cran.r-project.org/web/packages/ggthemes/index.html) and [gghighlight](https://cran.r-project.org/web/packages/gghighlight/vignettes/gghighlight.html).
 
 ### Additional data sources
-I accessed additional data sources using the COVID19 R package [@Guidotti2020]. Case numbers originated from the Oxford [COVID-19 GOVERNMENT RESPONSE TRACKER](https://www.bsg.ox.ac.uk/research/research-projects/covid-19-government-response-tracker) dataset. Mobility data was from the [Google Mobility Reports](https://www.google.com/covid19/mobility/). I also used clade definitions from the [NextClade](https://clades.nextstrain.org/) project.
+I accessed additional data sources using the COVID19 R package [@Guidotti2020]. Case numbers originated from the Oxford [COVID-19 GOVERNMENT RESPONSE TRACKER](https://www.bsg.ox.ac.uk/research/research-projects/covid-19-government-response-tracker) data set. Mobility data was from the [Google Mobility Reports](https://www.google.com/covid19/mobility/). I also used clade definitions from the [NextClade](https://clades.nextstrain.org/) project.
 
 # Results and Discussion
 
@@ -49,6 +49,7 @@ library("COVID19")
 library("gghighlight")
 library("lubridate")
 library("readr")
+library("RColorBrewer")
 
 # this loads all function files in the code/functions directory
 function_paths <- list.files("code/functions", full.names = TRUE)
@@ -144,12 +145,12 @@ ny_covid_data_zoom_plot <- ny_covid_data_zoom %>%
        y = "Confirmed Cases", x = "Date") +
   geom_vline(xintercept = as.numeric(as.Date("2020-03-20")),
              linetype = "dashed",
-             color = "red") +
+             color = "black") +
   theme_clean()
   
 ny_covid_data_zoom_plot
 ```
-***Figure 3*** Going for a zoomed-in look, we can see how rapidly new cases of SARS-CoV-2 infection were being recorded during a short few-week period in New York City. This steep incline likely reflects a greater rate of testing. The dashed green line indicates when New York State issued a statewide mandatory stay at home order.
+***Figure 3*** Going for a zoomed-in look, we can see how rapidly new cases of SARS-CoV-2 infection were being recorded during a short few-week period in New York City. This steep incline likely reflects a greater rate of testing. The dashed line indicates when New York State issued a statewide mandatory stay at home order.
 
 ```{r ny-mobility-data}
 # look at mobility data to get an idea of what mobility was like in NYC
@@ -193,12 +194,15 @@ clade_output <- make_sample_snps_table(clade_info, vcf_with_metadata)
 # make plot
 clade_plot <- 
   heatmap(clade_output,
+          margins = c(9,8),
           na.rm = TRUE,
-          main = "Relationship Between Clades and Sample Genotypes")
+          main = "Sample Similarity to SARS-CoV-2 Clades",
+          xlab = "Run ID",
+          ylab = "Clade")
 
 clade_plot
 ```
-***Figure 5*** 
+***Figure 5*** Heat map showing relationships between clades and sample genotypes. Darker colors represent a greater similarity. Hirearchical clustering points to two genetically distinct groups, with differing clade distinctions. For exact values, see Table 3.
 # Tables
 
 ```{r mobility-table}
@@ -230,18 +234,7 @@ NY_covid_data_mobility %>%
                              "Residential"))
 
 ```
-***Table 1*** Summary of Google mobility data from weeks 9-15 of the year 2020. Values represent the mean percent change from baseline for that week. The table shows a gradual decrease in most mobility factors over the first several weeks of the pandemic. Notably, the Google data shows an increase in mobility to grocery stores during weeks 9-11 which likely reflects the panic fueled stockpiling of necessities, a trend seen across the US which led to a shortage of items like toilet paper. Additionally, there was increasing mobility in residential areas, reflecting people seeking outdoor exercise around their homes during quarantine.   
-
-```{r variant-table}
-# make a table showing different SNPs and their locatioms
-vcf_with_metadata %>%
-  group_by(gene) %>%
-  tally() %>% 
-  knitr::kable(col.names = c("Gene Name",
-                             "Count"))
-```
-***Table 2*** Complete count of SNPs detected in the samples provided. The majority of SNPs were located in non coding regions of the genome. 
-
+***Table 1*** Summary of Google mobility data from weeks 9-15 of the year 2020. Values represent the mean percent change from baseline for that week. The table shows a gradual decrease in most mobility factors over the first several weeks of the pandemic. Notably, the Google data shows an increase in mobility to grocery stores during weeks 9-11 which likely reflects the panic fueled stockpiling of necessities, a trend seen across the US which led to a shortage of items like toilet paper. Additionally, there was increasing mobility in residential areas, likely a reflection of people seeking outdoor exercise around their homes during quarantine.   
 
 ```{r vcf-table}
 # make a table showing different SNPs and their locations
@@ -254,17 +247,13 @@ vcf_with_metadata %>%
   knitr::kable(col.names = c("Gene Name",
                              "Count"))
 ```
-***Table 3*** Count of distinct SNPs found for each named gene in the SARS-CoV-2 genome. In the samples provided, there were 7 distinct SNPs detected in named genes. Three of those variants were found in the N gene. It is worth noting that the SNP found in the spike protien was identified as the D614G variant which was the first known variant to surpass the wild type allele to become globally dominant.
+***Table 2*** Count of distinct SNPs found for each named gene in the SARS-CoV-2 genome. In the samples provided, there were 7 distinct SNPs detected in named genes. Three of those variants were found in the N gene. It is worth noting that the SNP found in the spike protien was identified as the D614G variant which was the first known variant to surpass the wild type allele to become globally dominant.
 
-```{r example-table}
-# An example table to show the length of each gene using its start and end
-gene_table %>%
-  mutate(length = end - start) %>%
-  select(gene_name, start, end, length) %>%
-  knitr::kable(col.names = c("Gene Name",
-                             "Start",
-                             "End",
-                             "Length"))
+```{r clade-table}
+# make a table showing results from check clades function
+knitr::kable(clade_output, digits = 2)
+
 ```
-**Table 4**: Gene names, locations, and lengths in the SARS-CoV-2 genome. Surprisingly, more distinct SNPs were detected in the N (nucleocapsid) gene, even though it is significantly smaller than the gene encoding the S (spike) protein. The nucleocapsid protien is thought to be involved in the efficiency of virion assembly. 
+***Table 3*** Matrix showing relationship between samples and clades. Value is the proportion of of SNPs in common over the total number in each clade. Higher values correspond to a greater similarity.
+
 # Sources Cited
