@@ -1,5 +1,5 @@
 ---
-title: 'Analysis of SARS-CoV-2 Infection In New York City at Early Stages of the COVID-19 Pandemic'
+title: 'Analysis of SARS-CoV-2 Infection in New York City in the Early Stages of the COVID-19 Pandemic'
 author: "Maggie Walsh"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: pdf_document
@@ -20,12 +20,23 @@ knitr::opts_chunk$set(echo = FALSE,
 
 # Background and Overview
 
-In early 2020, the world was forever changed by the spread of the coronavirus disease (COVID-19), which was declared a global pandemic by the WHO by early March. In the United States, New York City became the epicenter, with 203,000 confirmed cases between the months of March and May [@thompson2020covid]. Although news of the virus was widely overlooked initially, people quickly became aware of the insidious nature of the SARS-CoV-2 virus, including variable incubation times, and it's ability to spread via asymptomatic carriers. New York City was placed under a statewide lock-down on March 22, 2020, and the number of confirmed cases peaked a week later [@thompson2020covid]. As the machinery of our society was grinding to a halt, researchers raced to understand the SARS-CoV-2 virus in order to prevent further devastation. My goal for this report was to synthesize some of that research, and generate my own analysis that explains what was going on in New York City during the onset of the pandemic. My analysis started with a look into SARS-CoV-2 tests in New York, as well as a look at changes in mobility during this time. I used a bash pipeline to analyze sequence data taken from nasopharyngeal swabs of people in New York City from early March to late April. Variants were called from
+In early 2020, the world was forever changed by the spread of the coronavirus disease (COVID-19), which was declared a global pandemic by the WHO by early March. In the United States, New York City became the epicenter, with 203,000 confirmed cases between the months of March and May [@thompson2020covid]. Although news of the virus was widely overlooked initially, people quickly became aware of the insidious nature of the SARS-CoV-2 virus with variable incubation times, and it's ability to spread via asymptomatic carriers. New York City was placed under a statewide lock-down on March 22, 2020, and the number of confirmed cases peaked a week later [@thompson2020covid]. As the machinery of our society was grinding to a halt, researchers raced to understand the SARS-CoV-2 virus in order to prevent further devastation. My goal for this report was to synthesize some of that research, and generate my own analysis that explains what was going on in New York City during the onset of the pandemic. My analysis started with a look into SARS-CoV-2 case numbers in New York, as well as a look at changes in population mobility during this time. I also used a bash pipeline to analyze sequence data taken from nasopharyngeal swabs of people in New York City from early March to late April. Twelve samples were sequenced and variants were called against a reference genome to determine SNPs for variant analysis. My findings support 
 
 # Methods
-## Sequence Analysis
-Sequences were downloaded to a secure server from the [NCBI database](https://www.ncbi.nlm.nih.gov/) using the [accession ID](https://www.ncbi.nlm.nih.gov//bioproject/PRJNA721724). The bash pipeline was executed on the server using a makefile to output vcf files for analysis. Specific steps of the pipeline can be found in the code folder. Parts of the pipeline approach are based on the pipeline described in the [Data Carpentry Genomics lessons](https://datacarpentry.org/genomics-workshop/), which are made available under a [CC-BY 4.0 license](https://creativecommons.org/licenses/by/4.0/). 
 
+## Sample Sequencing and Variant Calling
+I downloaded sequences to a remote server from the [NCBI database](https://www.ncbi.nlm.nih.gov/) using the [accession ID](https://www.ncbi.nlm.nih.gov//bioproject/PRJNA721724), utilizing [fasterq-dump](https://github.com/ncbi/sra-tools/wiki/HowTo:-fasterq-dump) from the NCBI SRA toolkit. Samples were trimmed using the trimmomatic tool [@bolger2014trimmomatic]. My workflow utilized the Burrows Wheeler Aligner (BWA) to map reads against the refrence genome [@li2009fast] and SAMtools and BCFtools to sort and process the mapped reads [@li2009sequence]. Specific steps of my pipeline can be found in the [code folder](https://github.com/walshmags/walshmags-bioinformatics-final-project/tree/main/code) of this repository. Parts of the pipeline approach are based on the pipeline described in the [Data Carpentry Genomics lessons](https://datacarpentry.org/genomics-workshop/), which are made available under a [CC-BY 4.0 license](https://creativecommons.org/licenses/by/4.0/). I executed the bash pipeline on the USF server using a makefile to output vcf files for analysis.
+
+## Analysis
+
+### Reading in vcf files
+I analyzed the output from the bash pipeline in RStudio using a series of functions designed to format the vcf files into tabular data. The vcf files were read into R using the vcfR package [@knaus2017vcfr].
+
+### Analysis of tabular data
+I manipulated tabular data using the [dplyr](https://dplyr.tidyverse.org/) package. I made figures using the package [ggplot2](https://ggplot2.tidyverse.org/reference/index.html) and formatted them using the packages [ggthemes](https://cran.r-project.org/web/packages/ggthemes/index.html) and [gghighlight](https://cran.r-project.org/web/packages/gghighlight/vignettes/gghighlight.html).
+
+### Additional data sources
+I accessed additional data sources using the COVID19 R package [@Guidotti2020]. Case numbers originated from the Oxford [COVID-19 GOVERNMENT RESPONSE TRACKER](https://www.bsg.ox.ac.uk/research/research-projects/covid-19-government-response-tracker) dataset. Mobility data was from the [Google Mobility Reports](https://www.google.com/covid19/mobility/). I also used clade definitions from the [NextClade](https://clades.nextstrain.org/) project.
 
 # Results and Discussion
 
@@ -187,24 +198,16 @@ ny_covid_data_mobility_plot
 ***Figure 4*** Bar plot showing percent change in mobility at transit stations in New York, from a baseline set before the pandemic. This metric contradicts the steep rise in cases during this time, unless you account for the variable incubation time of the SARS-CoV-2 virus, and the probability of higher case rates in early 2020 than shown above due to insufficient testing. For more mobility information, see Table 1. 
 
 ```{r vcf-clade-analysis}
-# use clade file to do phylogenetic analysis of vcf data
+# download clade file
 clade_info <- read_tsv(paste0("https://raw.githubusercontent.com/nextstrain/",
                               "ncov/master/defaults/clades.tsv"))
 
-View(tidyr::pivot_wider(clade_info, names_from = clade, values_from = alt) %>% select(-gene) %>% arrange(site))
-
-# merge with vcf_with_metadata
-vcf_with_clade <- vcf_with_metadata %>%
-  left_join(clade_info, by = c("pos" = "site"))
+# use clade file to do phylogenetic analysis of vcf data, using function 
+# check_clades
+clade_output <- make_sample_snps_table(clade_info, vcf_with_metadata)
 
 # make plot
-clade_plot <- vcf_with_clade %>%
-  select(sample, pos, alt.x, clade) %>%
-  filter(!is.na(clade)) %>% 
-  ggplot(aes(clade)) +
-  geom_bar() +
-  labs(title = "Count of Variants Called by Assigned Clade") +
-  theme_clean()
+clade_plot <- heatmap(clade_output)
 
 clade_plot
 ```
