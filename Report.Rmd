@@ -145,7 +145,7 @@ ny_covid_data_zoom_plot <- ny_covid_data_zoom %>%
        y = "Confirmed Cases", x = "Date") +
   geom_vline(xintercept = as.numeric(as.Date("2020-03-20")),
              linetype = "dashed",
-             color = "black") +
+             color = "gray") +
   theme_clean()
   
 ny_covid_data_zoom_plot
