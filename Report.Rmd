@@ -20,7 +20,7 @@ knitr::opts_chunk$set(echo = FALSE,
 
 # Background and Overview
 
-In early 2020, the world was forever changed by the spread of the coronavirus disease (COVID-19), which was declared a global pandemic by the WHO by early March. In the United States, New York City became the epicenter, with 203,000 confirmed cases between the months of March and May [@thompson2020covid]. Although news of the virus was widely overlooked initially, people quickly became aware of the insidious nature of the SARS-CoV-2 virus with variable incubation times, and it's ability to spread via asymptomatic carriers. New York City was placed under a statewide lock-down on March 22, 2020, and the number of confirmed cases peaked a week later [@thompson2020covid]. As the machinery of our society was grinding to a halt, researchers raced to understand the SARS-CoV-2 virus in order to prevent further devastation. My goal for this report was to synthesize some of that research, and generate my own analysis that explains what was going on in New York City during the onset of the pandemic. My analysis started with a look into SARS-CoV-2 case numbers in New York, as well as a look at changes in population mobility during this time. I also used a bash pipeline to analyze sequence data taken from nasopharyngeal swabs of people in New York City from early March to late April. Twelve samples were sequenced and variants were called against a reference genome to determine SNPs for variant analysis. My findings support 
+In early 2020, the world was forever changed by the spread of the coronavirus disease (COVID-19), which was declared a global pandemic by the WHO in early March. In the United States, New York City became the epicenter, with 203,000 confirmed cases between the months of March and May [@thompson2020covid]. Although news of the virus was widely overlooked initially, people quickly became aware of the insidious nature of the SARS-CoV-2 virus. The SARS-CoV-2 virus is hard to track due to variable incubation time and it's ability to spread via asymptomatic carriers. The only way to fight this virus early on was through limiting person to person interaction. New York City was placed under a statewide lock-down on March 22, 2020. The number of confirmed cases peaked a week later [@thompson2020covid]. As the machinery of our society was grinding to a halt, researchers raced to understand the SARS-CoV-2 virus in order to prevent further devastation. My goal for this report was to synthesize some of that research, and generate my own analysis that explains what was going on in New York City during the onset of the pandemic. My analysis started with a look into SARS-CoV-2 case numbers in New York, as well as a look at changes in population mobility during this time. I also used a set of bioinformatics tools to analyze sequence data taken from nasopharyngeal swabs of people in New York City from early March to late April. Twelve samples were sequenced and variants were called against a reference genome to determine SNPs for variant analysis. My findings support the common concensus among researchers, that sees the high case numbers in new York as a result
 
 # Methods
 
@@ -77,24 +77,6 @@ vcf_with_metadata <- add_genes_metadata_to_vcfstack(
 
 # Figures
 
-```{r sample-plot}
-# create a plot of unique SNP locations within each gene across all samples
-vcf_with_metadata %>%
-  filter(!is.na(gene)) %>% # get rid of SNPs not in gene regions
-  group_by(gene, pos) %>%
-  tally() %>% # this gives a column n for the number of gene by position
-  group_by(gene) %>%
-  tally() %>% # this collapses that down to the number of unique SNP locations
-  ggplot(aes(x = gene,
-             y = n)) +
-    geom_col() +
-    labs(title = "Count of distinct SNPs in Named SARS-CoV-2 Genes",
-         x = "Gene Name") +
-  theme_few() # get rid of the grey background
-```
-
-**Figure 1**: N and S genes have more unique SNPs in the set of samples analyzed.
-
 ```{r Covid-Data}
 #trying to use COVID19 package to look at data regarding New York city
 # first get all covid data from period of interest
@@ -108,7 +90,7 @@ covid_plot <- covid_data_broad %>%
   ggplot(aes(date, confirmed)) +
   geom_line(aes(group = administrative_area_level_2)) +
   gghighlight(administrative_area_level_2 == "New York") +
-  labs(title = "Number of Confirmed SARS-CoV-2 Cases by State",
+  labs(title = "SARS-CoV-2 Cases by State",
        x = "Date", y = "Confirned Cases") +
   theme_clean()
 
@@ -134,13 +116,14 @@ ny_covid_data_plot <- ny_covid_data %>%
   ggplot(aes(date, confirmed)) +
          geom_line() +
   labs(title = "Number of Confirmed Cases in New York City",
+       subtitle = "over the past year",
        y = "Confirmed Cases", x = "Date") +
   theme_clean()
   
 ny_covid_data_plot
 
 ```
-***Figure 2*** Looking specifically at New York City, we can see a similar trend. New York City was responsible for a large portion of the nations case numbers during the first wave of the pandemic.
+***Figure 2*** Looking specifically at New York City, we can see a similar trend as the state case numbers shown above. New York City was responsible for a large portion of the nations case numbers during the first wave of the pandemic.
 
 ```{r ny-zoomed-in}
 # get specific covid data thats zoomed in on specific period
@@ -157,10 +140,11 @@ ny_covid_data_zoom_plot <- ny_covid_data_zoom %>%
   ggplot(aes(date, confirmed)) +
          geom_line() +
   labs(title = "Number of Confirmed Cases in New York City",
+       subtitile = "early March to mid April",
        y = "Confirmed Cases", x = "Date") +
   geom_vline(xintercept = as.numeric(as.Date("2020-03-20")),
              linetype = "dashed",
-             color = "green") +
+             color = "red") +
   theme_clean()
   
 ny_covid_data_zoom_plot
@@ -187,7 +171,7 @@ ny_covid_data_mobility <- covid_data_ny_mobility %>%
 ny_covid_data_mobility_plot <- ny_covid_data_mobility %>%
   ggplot(aes(date, transit_stations_percent_change_from_baseline)) +
   geom_bar(stat = "identity") +
-  labs(title = "Bar Plot of Transit Mobility in New York City",
+  labs(title = "Transit Mobility in New York City",
        x = "Date",
        y = "% change from baseline") +
   theme_clean()
@@ -207,7 +191,10 @@ clade_info <- read_tsv(paste0("https://raw.githubusercontent.com/nextstrain/",
 clade_output <- make_sample_snps_table(clade_info, vcf_with_metadata)
 
 # make plot
-clade_plot <- heatmap(clade_output)
+clade_plot <- 
+  heatmap(clade_output,
+          na.rm = TRUE,
+          main = "Relationship Between Clades and Sample Genotypes")
 
 clade_plot
 ```
@@ -253,7 +240,8 @@ vcf_with_metadata %>%
   knitr::kable(col.names = c("Gene Name",
                              "Count"))
 ```
-***Table 2***
+***Table 2*** Complete count of SNPs detected in the samples provided. The majority of SNPs were located in non coding regions of the genome. 
+
 
 ```{r vcf-table}
 # make a table showing different SNPs and their locations
@@ -266,7 +254,7 @@ vcf_with_metadata %>%
   knitr::kable(col.names = c("Gene Name",
                              "Count"))
 ```
-***Table 3*** Count of distinct SNP's found for each named gene in the SARS-CoV-2 genome. 
+***Table 3*** Count of distinct SNPs found for each named gene in the SARS-CoV-2 genome. In the samples provided, there were 7 distinct SNPs detected in named genes. Three of those variants were found in the N gene. It is worth noting that the SNP found in the spike protien was identified as the D614G variant which was the first known variant to surpass the wild type allele to become globally dominant.
 
 ```{r example-table}
 # An example table to show the length of each gene using its start and end
@@ -278,5 +266,5 @@ gene_table %>%
                              "End",
                              "Length"))
 ```
-**Table 4**: Gene names, locations, and lengths in the SARS-CoV-2 genome. 
+**Table 4**: Gene names, locations, and lengths in the SARS-CoV-2 genome. Surprisingly, more distinct SNPs were detected in the N (nucleocapsid) gene, even though it is significantly smaller than the gene encoding the S (spike) protein. The nucleocapsid protien is thought to be involved in the efficiency of virion assembly. 
 # Sources Cited
