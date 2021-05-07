@@ -127,7 +127,7 @@ covid_plot
 ***Figure 1***: Plot of confirmed SARS-CoV-2 cases in the past year. New York state was the hardest hit early on in the pandemic having a majority of the nations confirmed cases. The steep rise in cases was contained in subsequent months. In recent winter months, New York, alongside other states, saw another steep rise in cases.
 
 
-```{r ny-Data}
+```{r ny-data}
 # get specific covid data
 covid_data_specific <- COVID19::covid19(country = "USA",
                                   level = 3,
