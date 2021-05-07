@@ -20,7 +20,7 @@ knitr::opts_chunk$set(echo = FALSE,
 
 # Background and Overview
 
-In early 2020, the world was forever changed by the spread of the coronavirus disease (COVID-19), which was declared a global pandemic by the World Health Organization (WHO) in early March. New York City quickly emerged as the epicenter in the United States with 203,000 confirmed cases between the months of March and May [@thompson2020covid]. Although news of the virus was widely overlooked initially, people quickly became aware of the insidious nature of the SARS-CoV-2 virus. The SARS-CoV-2 virus was hard to track due to it's variable incubation time and it's ability to spread via asymptomatic carriers. The only way to fight this virus early on was through limiting person to person interaction. New York City was placed under a statewide lock-down on March 22, 2020. The number of confirmed cases peaked a week later [@thompson2020covid]. As the machinery of our society was grinding to a halt, researchers raced to understand the SARS-CoV-2 virus in order to prevent further devastation. My goal for this report was to synthesize some of that research, and generate my own analysis that explains what was going on in New York City during the onset of the pandemic. My analysis started with a look into SARS-CoV-2 case numbers in New York, followed by a look at changes in population mobility during this time. I also used a set of bioinformatics tools to analyze sequence data taken from nasopharyngeal swabs of people in New York City from early March to late April. Twelve samples were sequenced and variants were called against a reference genome to determine SNPs for analysis. The common consensus among researchers is that the high case numbers in New York City was the result of uncontrolled community spread after many different travelers (mainly from Europe) introduced the virus to the population [@bushman2020detection; @gonzalez2020introductions; @maurano2020sequencing]. My findings corroborate this story. I found that the population data pointed to  
+In early 2020, the world was forever changed by the spread of the coronavirus disease (COVID-19), which was declared a global pandemic by the World Health Organization (WHO) in early March. New York City quickly emerged as the epicenter in the United States with 203,000 confirmed cases between the months of March and May [@thompson2020covid]. Although news of the virus was widely overlooked initially, people quickly became aware of the insidious nature of the SARS-CoV-2 virus. The SARS-CoV-2 virus was hard to track due to it's variable incubation time and it's ability to spread via asymptomatic carriers. The only way to fight this virus early on was through limiting person to person interaction. New York City was placed under a statewide lock-down on March 22, 2020. The number of confirmed cases peaked a week later [@thompson2020covid]. As the machinery of our society was grinding to a halt, researchers raced to understand the SARS-CoV-2 virus in order to prevent further devastation. My goal for this report was to synthesize some of that research, and generate my own analysis that explains what was going on in New York City during the onset of the pandemic. My analysis started with a look into SARS-CoV-2 case numbers in New York, followed by a look at changes in population mobility during this time. I also used a set of bioinformatics tools to analyze sequence data taken from nasopharyngeal swabs of people in New York City from early March to late April. Twelve samples were sequenced and variants were called against a reference genome to determine SNPs for analysis. The common consensus among researchers is that the high case numbers in New York City was the result of uncontrolled community spread after many different travelers (mainly from Europe) introduced the virus to the population [@bushman2020detection; @gonzalez2020introductions; @maurano2020sequencing]. My findings corroborate this story. My goal for this report is to demonstrate the importance of our public health infrastructure, and show how bioinformatics tools can be used to investigate phenomena and generate a compelling narrative that contribues to our understanding of complex and multifaceted events such as the SARS-CoV-2 pandemic.
 
 # Methods
 
@@ -104,7 +104,7 @@ vcf_with_metadata <- add_genes_metadata_to_vcfstack(
 
 # Figures
 
-```{r Covid-Data}
+```{r covid-data}
 #trying to use COVID19 package to look at data regarding New York city
 # first get all covid data from period of interest
 covid_data_broad <- COVID19::covid19(country = "USA",
@@ -127,7 +127,7 @@ covid_plot
 ***Figure 1***: Plot of confirmed SARS-CoV-2 cases in the past year. New York state was the hardest hit early on in the pandemic having a majority of the nations confirmed cases. The steep rise in cases was contained in subsequent months. In recent winter months, New York, alongside other states, saw another steep rise in cases.
 
 
-```{r NY-Data}
+```{r ny-Data}
 # get specific covid data
 covid_data_specific <- COVID19::covid19(country = "USA",
                                   level = 3,
@@ -213,18 +213,17 @@ ny_covid_data_mobility_plot
 clade_info <- read_tsv(paste0("https://raw.githubusercontent.com/nextstrain/",
                               "ncov/master/defaults/clades.tsv"))
 
-# use clade file to do phylogenetic analysis of vcf data, using function 
+# use clade file to do phylogenetic analysis of vcf data, using function
 # check_clades
 clade_output <- make_sample_snps_table(clade_info, vcf_with_metadata)
 
 # make plot
-clade_plot <- 
-  heatmap(clade_output,
-          margins = c(9,8),
-          na.rm = TRUE,
-          main = "Sample Similarity to SARS-CoV-2 Clades",
-          xlab = "Run ID",
-          ylab = "Clade")
+clade_plot <- heatmap(clade_output,
+                      margins = c(9, 8),
+                      na.rm = TRUE,
+                      main = "Sample Similarity to SARS-CoV-2 Clades",
+                      xlab = "Run ID",
+                      ylab = "Clade")
 
 clade_plot
 ```
@@ -279,7 +278,6 @@ vcf_with_metadata %>%
 ```{r clade-table}
 # make a table showing results from check clades function
 knitr::kable(clade_output, digits = 2)
-
 ```
 ***Table 3*** Matrix showing relationship between samples and clades. Value is the proportion of of SNPs in common over the total number in each clade. Higher values correspond to a greater similarity.
 
