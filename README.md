@@ -20,6 +20,7 @@ ID number: 721724
  * create figures that demonstrate how coronavirus rescticions impacted variant data in New York
 
 ## Change Log
+2021-05-05: Started report manuscript, finalized figures and added refrences.
 2021-05-03: Started code to identify samples by clade, started report write up and generated tables to visualise mobility and variant data.
 2021-04-30: Created plot of mobility data in New York
 2021-04-28: Used `COVID19` package data to create figures showing nationwide Covid-19 case numbers and case numbers in New York City.
