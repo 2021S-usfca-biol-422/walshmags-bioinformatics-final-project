@@ -56,7 +56,7 @@ make_sample_snps_table <- function(clade_dataset, vcf_with_metadata_dataset) {
       # number in the clade. The idea is that if this is high, then this
       # sample has a good number of the snps in this clade
       output_table[row_num, col_num] <-
-        number_of_snp_loc_in_common/nrow(this_clade_snps)
+        number_of_snp_loc_in_common / nrow(this_clade_snps)
     }
   }
 
