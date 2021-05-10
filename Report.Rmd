@@ -110,7 +110,8 @@ vcf_with_metadata <- add_genes_metadata_to_vcfstack(
 covid_data_broad <- COVID19::covid19(country = "USA",
                                   level = 2,
                                   start = "2020-02-01",
-                                  end = "2021-04-28")
+                                  end = "2021-04-28",
+                                  verbose = FALSE)
 
 # make a plot summarizing covid cases by state during this time
 covid_plot <- covid_data_broad %>%
@@ -132,7 +133,8 @@ covid_plot
 covid_data_specific <- COVID19::covid19(country = "USA",
                                   level = 3,
                                   start = "2020-03-01",
-                                  end = "2021-04-28")
+                                  end = "2021-04-28",
+                                  verbose = FALSE)
 
 # filter out NY data
 ny_covid_data <- covid_data_specific %>%
@@ -157,7 +159,8 @@ ny_covid_data_plot
 covid_data_specific_zoom <- COVID19::covid19(country = "USA",
                                   level = 3,
                                   start = "2020-03-01",
-                                  end = "2020-04-10")
+                                  end = "2020-04-10",
+                                  verbose = FALSE)
 
 ny_covid_data_zoom <- covid_data_specific_zoom %>%
   filter(administrative_area_level_3 == "New York City")
@@ -168,7 +171,8 @@ ny_covid_data_zoom_plot <- ny_covid_data_zoom %>%
          geom_line() +
   labs(title = "Number of Confirmed Cases in New York City",
        subtitile = "early March to mid April",
-       y = "Confirmed Cases", x = "Date") +
+       y = "Confirmed Cases",
+       x = "Date") +
   geom_vline(xintercept = as.numeric(as.Date("2020-03-20")),
              linetype = "dashed",
              color = "gray") +
@@ -186,7 +190,8 @@ covid_data_ny_mobility <- COVID19::covid19(country = "USA",
                               end = "2020-04-10",
                               gmr =  paste0("https://www.gstatic.com/covid19/",
                                            "mobility/",
-                                           "Global_Mobility_Report.csv"))
+                                           "Global_Mobility_Report.csv"),
+                              verbose = FALSE)
 
 # filter NYC data
 ny_covid_data_mobility <- covid_data_ny_mobility %>%
@@ -223,7 +228,8 @@ clade_plot <- heatmap(clade_output,
                       na.rm = TRUE,
                       main = "Sample Similarity to SARS-CoV-2 Clades",
                       xlab = "Run ID",
-                      ylab = "Clade")
+                      ylab = "Clade",
+                      verbose = FALSE)
 
 clade_plot
 ```
@@ -235,8 +241,9 @@ clade_plot
 # Make a table summarizing all of the google mobility data
 # using code from https://stackoverflow.com/questions/40554231/
 # html cont dplyr-lubridate-how-to-aggregate-a-dataframe-by-week/4055452
-NY_covid_data_mobility %>%
-  select(date, retail_and_recreation_percent_change_from_baseline,
+ny_covid_data_mobility %>%
+  select(date,
+         retail_and_recreation_percent_change_from_baseline,
          grocery_and_pharmacy_percent_change_from_baseline,
          parks_percent_change_from_baseline,
          transit_stations_percent_change_from_baseline,
@@ -277,7 +284,9 @@ vcf_with_metadata %>%
 
 ```{r clade-table}
 # make a table showing results from check clades function
-knitr::kable(clade_output, digits = 2)
+knitr::kable(clade_output,
+             digits = 2,
+             col.names = c(40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51))
 ```
 ***Table 3*** Matrix showing relationship between samples and clades. Value is the proportion of of SNPs in common over the total number in each clade. Higher values correspond to a greater similarity.
 
