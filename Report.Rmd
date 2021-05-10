@@ -2,9 +2,7 @@
 title: 'Analysis of SARS-CoV-2 Infection in New York City in the Early Stages of the COVID-19 Pandemic'
 author: "Maggie Walsh"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output:
-  pdf_document:
-  latex_engine: xelatex
+output: pdf_document
 csl: bioinformatics.csl
 bibliography: references.bib
 params:
