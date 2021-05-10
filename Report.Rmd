@@ -223,15 +223,13 @@ clade_info <- read_tsv(paste0("https://raw.githubusercontent.com/nextstrain/",
 clade_output <- make_sample_snps_table(clade_info, vcf_with_metadata)
 
 # make plot
-clade_plot <- heatmap(clade_output,
-                      margins = c(9, 8),
-                      na.rm = TRUE,
-                      main = "Sample Similarity to SARS-CoV-2 Clades",
-                      xlab = "Run ID",
-                      ylab = "Clade",
-                      verbose = FALSE)
-
-clade_plot
+heatmap(clade_output,
+        margins = c(9, 8),
+        na.rm = TRUE,
+        main = "Sample Similarity to SARS-CoV-2 Clades",
+        xlab = "Run ID",
+        ylab = "Clade",
+        verbose = FALSE)
 ```
 ***Figure 5*** Heat map showing relationships between clades and sample genotypes. Darker colors represent a greater similarity. Hierarchical clustering points to two genetically distinct groups, with differing clade distinctions. For exact values, see Table 3.
 
