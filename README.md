@@ -13,17 +13,17 @@ ID number: 721724
 ### Outline of Analysis Steps
 1. Sequence Analysis and Variant Calling 
  * do a sequence analysis and call variants (pipeline steps can be found in `code` folder)
- * organize variant data by date, look at rate of variants, different types, etc (R funcions `in code/functions`)
+ * organize variant data by date, look at rate of variants, different types, etc (R funcions in `code/functions`)
 2. Analysis of Tabular Data
  * use tabular data to visualize the time line for corona virus restrictions, case numbers, and mobility data. (code chunks in Rmd)
 3. Compare Variant and Restriction Data
  * create figures that demonstrate how corona virus restrictions impacted variant data in New York (code chunks in Rmd)
 
 ## Change Log
-2021-05-11: Finalized report, fixed any style errors.
-2021-05-05: Started report manuscript, finalized figures and added references.
-2021-05-03: Started code to identify samples by clade, started report write up and generated tables to visualise mobility and variant data.
-2021-04-30: Created plot of mobility data in New York
-2021-04-28: Used `COVID19` package data to create figures showing nationwide Covid-19 case numbers and case numbers in New York City.
-2021-04-26: Finished variant calling analysis of New York SARS-CoV-2 sequences. Added vcf data to report Rmd and started using NY covid data to create figures.
-2021-04-19: Forked and cloned template repo, and updated README to include plan for final project. 
+* 2021-05-11: Finalized report, fixed any style errors.
+* 2021-05-05: Started report manuscript, finalized figures and added references.
+* 2021-05-03: Started code to identify samples by clade, started report write up and generated tables to visualise mobility * and variant data.
+* 2021-04-30: Created plot of mobility data in New York
+* 2021-04-28: Used `COVID19` package data to create figures showing nationwide Covid-19 case numbers and case numbers in New York City.
+* 2021-04-26: Finished variant calling analysis of New York SARS-CoV-2 sequences. Added vcf data to report Rmd and started using NY covid data to create figures.
+* 2021-04-19: Forked and cloned template repo, and updated README to include plan for final project. 
